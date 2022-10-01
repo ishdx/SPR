@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:sprint/screens/firebase_user_details.dart';
 import 'package:sprint/screens/inviteFriends.dart';
 
@@ -20,11 +21,22 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final FirebaseMessaging _fcm = FirebaseMessaging.instance;
+  final Firestore = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
   late User signedInUser;
 
   @override
   void initState() {
+    _fcm.getToken().then((token) {
+      //print("The token is:" + token!);
+      Firestore.collection('tokens')
+          .doc(FirebaseAuth.instance.currentUser!.email)
+          .set({
+        'token': token,
+        //'userID': FirebaseAuth.instance.currentUser!.email
+      });
+    });
     super.initState();
     fetchUserfromFirebase();
     getCurrentUser();
@@ -95,14 +107,18 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    'الجمعية : ${data['name']}',
+                                                    'اسم الجمعية : ${data['name']}',
                                                     style:
                                                         TextStyle(fontSize: 17),
                                                   ),
                                                   SizedBox(
                                                     height: 10,
                                                   ),
-                                                  
+                                                  Text(
+                                                    'إجمالي أعضاء المجموعة: ${data['maxMembers'].toString()}',
+                                                    style:
+                                                        TextStyle(fontSize: 17),
+                                                  ),
                                                 ],
                                               ),
                                               Column(children: [
@@ -114,7 +130,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                               builder: (context) =>
                                                                   FirebaseUserDetails(
                                                                       data:
-                                                                          data, jamiaId: '',)));
+                                                                          data)));
                                                     },
                                                     child:
                                                         Icon(Icons.visibility)),
@@ -230,7 +246,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     minWidth: 40,
                   ),
                   MaterialButton(
-                    onPressed: () {Navigator.pushNamed(context, '/RequestPageFinal');},
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/RequestPageFinal');
+                    },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

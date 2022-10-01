@@ -1,6 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:sprint/screens/registration_screen.dart';
-
 class Validations {
   String? validate(int decide, String value) {
     //ناقص 0,3,7
@@ -29,13 +26,79 @@ class Validations {
       case 7:
         // UserName
         return validateUserName(value);
-
       case 8:
         // UserName
         return validateSimple(value);
+      case 9:
+        //validateIBAN
+        return validateIBAN(value);
+      case 10:
+        //card expiration date
+        return validateExpirationDate(value);
+      case 11:
+        //card cvv number
+        return validateCVV(value);
+      case 12:
+        //Bank Name
+        return validateBankName(value);
       default:
         return null;
     }
+  }
+
+  String? validateIBAN(String value) {
+    RegExp regex = RegExp(r'^SA\d{4}[A-Z0-9]{18}$');
+    // if the validateIBAN is obligatory uncomment the comment below
+    if (value.isEmpty || value.trim().isEmpty) {
+      return null;
+      // return ("الرجاء ادخال رقم الايبان");
+    }
+    if (!regex.hasMatch(value)) {
+      return ("رقم الايبان المدخل غير صحيح");
+    }
+    return null;
+  }
+
+  String? validateCVV(String value) {
+    RegExp regex = RegExp(r'^[0-9]{3}$');
+    // if the cvv is obligatory uncomment the comment below
+    if (value.isEmpty || value.trim().isEmpty) {
+      // return ("لا يمكن ترك الخانه فارغة");
+      return null;
+    }
+    if (!regex.hasMatch(value)) {
+      return ("الرقم المدخل غير صحيح");
+    }
+    if (value.length != 3) {
+      return ("الرقم المدخل غير صحيح");
+    }
+    return null;
+  }
+
+  String? validateExpirationDate(String value) {
+    RegExp regex = RegExp(r'^(0[1-9]|1[0-2])\/?([0-9]{4}|[0-9]{2})$');
+    // if the expiration date is obligatory uncomment the comment below
+    if (value.isEmpty || value.trim().isEmpty) {
+      // return ("لا يمكن ترك الخانه فارغة");
+      return null;
+    }
+    if (!regex.hasMatch(value)) {
+      return ("التاريخ المدخل غير صحيح");
+    }
+    return null;
+  }
+
+  String? validateBankName(String value) {
+    RegExp regex = RegExp(r'^((?:[A-Za-z]+ ?){1,3})$');
+    //if card owner name is obligatory uncomment the comment below
+    if (value.isEmpty || value.trim().isEmpty) {
+      return null;
+      // return 'الاسم مطلوب';
+    }
+    if (!regex.hasMatch(value)) {
+      return ("الرجاء ادخال اسم بنك صحيح");
+    }
+    return null;
   }
 
   String? validateSimple(String value) {
